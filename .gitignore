@@ -1,0 +1,8 @@
+/.vscode
+/CMakeFiles
+/bin
+/build
+/data
+*.cmake
+CMakeCache.txt
+Makefile
