@@ -1,6 +1,13 @@
 # Client-Server IPC
 
-Sistema de comunicación entre procesos utilizando una arquitectura cliente-servidor. Para compilar el proyecto, una vez clonado el repositorio, basta con crear el Makefile utilizando el script CMake y ejecutarlo:
+Sistema de comunicación entre procesos utilizando una arquitectura cliente-servidor. 
+
+### Autores:
+- **Bottini, Franco Nicolas**
+
+### ¿ Como compilar ?
+
+Para compilar el proyecto, una vez clonado el repositorio, basta con crear el Makefile utilizando el script CMake y ejecutarlo:
 
 ```bash
 $ git clone https://github.com/francobottini99/LINUXCLIENTSERVER1-2023.git
@@ -9,9 +16,6 @@ $ cmake .
 $ make
 ```
 Como salida obtendremos dos ejecutables ubicados en la carpeta `/bin`: `Client` y `Server`.
-
-### Autores:
-- **Bottini, Franco Nicolas**
 
 ## Cliente
 
