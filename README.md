@@ -10,7 +10,10 @@ $ make
 ```
 Como salida obtendremos dos ejecutables ubicados en la carpeta `/bin`: `Client` y `Server`.
 
-## Client
+### Autores:
+- **Bottini, Franco Nicolas**
+
+## Cliente
 
 Con el binario `Client` se generan los procesos que se van a comunicar con el servidor por medio de diferentes mecanismos de **IPC**, estos son:
 
