@@ -1,13 +1,13 @@
 # Client-Server IPC
 
-Sistema de comunicación entre procesos utilizando una arquitectura cliente-servidor. 
+Inter-process communication system using a client-server architecture.
 
-### Autores:
+### Authors:
 - **Bottini, Franco Nicolas**
 
-### ¿ Como compilar ?
+### How to compile?
 
-Para compilar el proyecto, una vez clonado el repositorio, basta con crear el Makefile utilizando el script CMake y ejecutarlo:
+To compile the project, once you have cloned the repository, simply create the Makefile using the CMake script and run it:
 
 ```bash
 $ git clone https://github.com/francobottini99/LINUXCLIENTSERVER1-2023.git
@@ -15,100 +15,114 @@ $ cd LINUXCLIENTSERVER1-2023
 $ cmake .
 $ make
 ```
-Como salida obtendremos dos ejecutables ubicados en la carpeta `/bin`: `Client` y `Server`.
 
-## Cliente
+This will generate two executables located in the `/bin` folder: `Client` and `Server`.
 
-Con el binario `Client` se generan los procesos que se van a comunicar con el servidor por medio de diferentes mecanismos de **IPC**, estos son:
+## Client
+
+The `Client` binary generates processes that communicate with the server via different **IPC** mechanisms, these are:
 
 - *FIFO* (0)
 - *SHARED MEMORY* (1)
 - *MESSAGE QUEUE* (2)
 
-Una vez creado un proceso cliente, este enviara el primer mensaje al servidor en un plazo pseudoaleatorio de 0 a 3 segundo, luego de esto, el envió de mensajes se repite en intervalos pseudoaleatorios de entre 1 y 5 segundos. El cliente continua su ejecución indefinidamente hasta que es finalizado por el usuario, o en su defecto, hasta que finaliza la ejecución del servidor. Los mensajes enviados son simplemente números enteros secuenciales comenzando desde el 0.
+Once a client process is created, it sends the first message to the server within a pseudo-random interval of 0 to 3 seconds. After that, the message sending repeats at pseudo-random intervals between 1 and 5 seconds. The client continues running indefinitely until it is terminated by the user, or until the server execution ends. The messages sent are simply sequential integers starting from 0.
 
-Para crear un proceso cliente es necesario que el proceso servidor este en ejecución en el equipo y se debe dar como argumento de entrada al binario el tipo de mecanismo **IPC** que va a utilizar el nuevo cliente:
-```bash
-$ ./bin/Client 0 # Ejecuta un cliente FIFO
-$ ./bin/Client 1 # Ejecuta un cliente SHARED MEMORY
-$ ./bin/Client 2 # Ejecuta un cliente MESSAGE QUEUE
-```
-Se pueden ejecutar tantos procesos cliente como se desee. Estos procesos admiten la ejecución en segundo plano utilizando `&`:
-```bash
-$ ./bin/Client 0 & # Ejecuta un cliente FIFO en segundo plano
-$ ./bin/Client 1 & # Ejecuta un cliente SHARED MEMORY en segundo plano
-$ ./bin/Client 2 & # Ejecuta un cliente MESSAGE QUEUE en segundo plano
-```
-Se pueden generar `N` procesos clientes en segundo plano utilizando el script `Create.bash` ubicado en el directorio `/test`. Este recibe como argumento de entrada el numero de clientes a crear:
-```bash
-$ ./test/Create.bash 100 # Ejecuta 100 clientes en segundo plano
-```
-El script define el tipo de comunicación para cada uno de estos `N` clientes de manera aleatoria uniforme. Es decir ejecutando 100 clientes se crearan aproximadamente 33 clientes *FIFO*, 33 clientes *SHARED MEMORY* y 33 clientes *MESSAGE QUEUE*.
-Para conocer el numero de clientes activos corriendo en el sistema (en primer y segundo plano), se puede utilizar el script `Active.bash`:
-```bash
-$ ./test/Active.bash # Imprime en consola el numero de procesos cliente activos
-```
-Por otra parte, para finalizar la ejecución de todos los clientes activos (en primer y segundo plano), se puede utilizar el script `Clear.bash`:
-```bash
-$ ./test/Clear.bash # Finaliza la ejecucion de todos los procesos cliente activos
-```
-Estos dos scripts tambien se encuentran el directorio `/test`.
+To create a client process, the server process must be running, and the type of **IPC** mechanism the new client will use must be passed as an argument to the binary:
 
-## Servidor
+```bash
+$ ./bin/Client 0 # Runs a FIFO client
+$ ./bin/Client 1 # Runs a SHARED MEMORY client
+$ ./bin/Client 2 # Runs a MESSAGE QUEUE client
+```
 
-El binario `Server` ejecuta el proceso servidor al que se van a conectar los clientes del sistema. Este proceso controla el flujo de mensajes generados por los clientes a través de los tres distintos canales **IPC**:
+You can run as many client processes as desired. These processes can run in the background using `&`:
+
+```bash
+$ ./bin/Client 0 & # Runs a FIFO client in the background
+$ ./bin/Client 1 & # Runs a SHARED MEMORY client in the background
+$ ./bin/Client 2 & # Runs a MESSAGE QUEUE client in the background
+```
+
+You can generate `N` background client processes using the `Create.bash` script located in the `/test` directory. It takes as input the number of clients to create:
+
+```bash
+$ ./test/Create.bash 100 # Runs 100 clients in the background
+```
+
+The script defines the communication type for each of these `N` clients randomly. That is, when running 100 clients, approximately 33 FIFO clients, 33 SHARED MEMORY clients, and 33 MESSAGE QUEUE clients will be created. To know the number of active clients running in the system (both foreground and background), you can use the `Active.bash` script:
+
+```bash
+$ ./test/Active.bash # Prints the number of active client processes
+```
+
+Furthermore, to terminate all active client processes (both foreground and background), you can use the `Clear.bash` script:
+
+```bash
+$ ./test/Clear.bash # Ends all active client processes
+```
+
+These two scripts are also located in the `/test` directory.
+
+## Server
+
+The `Server` binary runs the server process that the system's clients will connect to. This process controls the flow of messages generated by the clients through the three different **IPC** channels:
 
 - *FIFO*
 - *SHARED MEMORY*
 - *MESSAGE QUEUE*
 
-Para ejecutar el servidor basta con ejecutar el binario: 
+To run the server, simply execute the binary:
+
 ```bash
-$ ./bin/Server # Lanza el proceso Servidor
+$ ./bin/Server # Starts the Server process
 ```
-El proceso no admite múltiples ejecuciones, es decir, no  puede haber mas de un proceso servidor corriendo en el equipo al mismo tiempo.
 
-Mientras el servidor este en ejecución, cada vez que se recibe un mensaje de un cliente, se imprime en consola el contenido del mensaje y la información del cliente que lo envió. Sumado a esto, se muestran las estadísticas de ejecución del servidor, donde se recopila: la cantidad de mensajes recibidos por cada canal, la cantidad de fallos de conexión ocurridos (*timeout*) en la comunicación y la taza de recepción de mensajes (mensajes / segundos). Estos datos, ademas de imprimirse por consola, persisten en un archivo ubicado en el directorio `/data` con el nombre: 
+The process does not allow multiple executions, meaning that only one server process can be running on the machine at a time.
+
+While the server is running, every time it receives a message from a client, it prints the content of the message and the client information. In addition, it displays server execution statistics, which include: the number of messages received from each channel, the number of connection failures (*timeouts*) that occurred in communication, and the message reception rate (messages per second). This data is printed on the console and also persisted in a file located in the `/data` directory with the name:
+
 ```
-server_stats_{pid_server}_{fecha_hora_de_inicio}.txt
+server_stats_{pid_server}_{start_date_time}.txt
 ```
-De esta manera, para cada ejecución de un proceso servidor, existe un archivo asociado con sus estadísticas.
 
-## Lógica de Funcionamiento
+Thus, for each execution of a server process, there is a file associated with its statistics.
 
-Para comenzar una comunicación con el servidor, el cliente le envía una señal a este solicitando un inicio de escritura y notificando el canal que quiere utilizar (*FIFO*, *SHARED MEMORY* o *MESSAGE QUEUE*). El servidor al procesar esta señal, verifica si el canal solicitado esta siendo utilizado por otro cliente y retorna una señal de respuesta, existen dos posibilidades: 
-- El canal esta vació: el servidor responde con una señal de inicio de escritura y bloquea el canal solicitado para que otro cliente no lo use mientras se esta escribiendo en el. 
-- El canal esta ocupado: el servidor responde con una señal de espera. 
+## Logic of Operation
 
-De esta manera, si el cliente recibe una señal de inicio de escritura, procede a escribir el mensaje en el canal acordado y al finalizar envía una señal de fin de escritura. En caso de que el cliente reciba una señal de espera, pausa su ejecución un tiempo pseudoaletorio de entre 10 y 1000 micro segundos y repite el proceso desde el inicio. 
+To initiate communication with the server, the client sends a signal requesting to start writing and notifying which channel it wants to use (*FIFO*, *SHARED MEMORY*, or *MESSAGE QUEUE*). The server, upon processing this signal, checks if the requested channel is being used by another client and returns a response signal. There are two possibilities:
+- The channel is empty: the server responds with a start write signal and locks the requested channel so that no other client can use it while it is being written to.
+- The channel is occupied: the server responds with a wait signal.
 
-Finalmente, cuando el servidor recibe una señal de fin de escritura por parte de un cliente, procese a leer el contenido del canal acordado previamente entre ambos y lo desbloquea para ser utilizado por otro cliente. 
+In this way, if the client receives a start write signal, it proceeds to write the message in the agreed-upon channel, and once finished, it sends a write end signal. If the client receives a wait signal, it pauses its execution for a pseudo-random time between 10 and 1000 microseconds and repeats the process from the beginning.
 
-En caso de que el servidor haya dado la señal de inicio de escritura a un cliente, se establece un periodo máximo de bloqueo del canal solicitado de 10 mili segundos, si en esta ventana de tiempo el cliente no notifico el final de escritura, se produce un *timeout* y se libera el canal automáticamente. Del lado del cliente, existe un periodo de espera máximo de 1 segundo para recibir una respuesta al pedido de inicio de escritura, superado este tiempo se repite la solicitud. 
+Finally, when the server receives a write end signal from a client, it processes the content of the channel previously agreed upon and unlocks it so that another client can use it.
 
-Ejemplo de utilizacion del canal *FIFO* para transmitir un mensaje:
+If the server has given the start write signal to a client, there is a maximum lock period for the requested channel of 10 milliseconds. If the client does not notify the end of writing within this time window, a *timeout* occurs, and the channel is automatically released. On the client side, there is a maximum wait period of 1 second to receive a response to the start write request; if this time is exceeded, the request is repeated.
+
+Example of using the *FIFO* channel to transmit a message:
 
 ```mermaid
 sequenceDiagram
 	loop
-		CLIENTE ->> SERVIDOR: START_WRITE, FIFO
-		CLIENTE -->> CLIENTE: wait_response()
+		CLIENT ->> SERVER: START_WRITE, FIFO
+		CLIENT -->> CLIENT: wait_response()
 		
 		alt is_not_client_timeout
 			alt is_lock(FIFO)
-			    SERVIDOR ->> CLIENTE: WAIT
-			    CLIENTE -->> CLIENTE: sleep()
+			    SERVER ->> CLIENT: WAIT
+			    CLIENT -->> CLIENT: sleep()
 			else
-			    SERVIDOR -->> SERVIDOR: lock(FIFO)
-			    SERVIDOR ->> CLIENTE: START_WRITE
-			    CLIENTE --> SERVIDOR: write(FIFO)
+			    SERVER -->> SERVER: lock(FIFO)
+			    SERVER ->> CLIENT: START_WRITE
+			    CLIENT --> SERVER: write(FIFO)
     
 				alt is_not_server_timeout
-					CLIENTE ->> SERVIDOR: END_WRITE, FIFO
-					SERVIDOR --> CLIENTE: read(FIFO)	
+					CLIENT ->> SERVER: END_WRITE, FIFO
+					SERVER --> CLIENT: read(FIFO)	
 				end
 				
-				SERVIDOR -->> SERVIDOR: unlock(FIFO)
+				SERVER -->> SERVER: unlock(FIFO)
 			end
 		end
 	end
